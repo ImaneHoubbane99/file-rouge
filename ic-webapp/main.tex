@@ -1,0 +1,235 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+    pdftitle={Kubernetes Deployment Setup},
+    pdfpagemode=FullScreen,
+}
+
+\lstdefinelanguage{yaml}{
+    keywords={true,false,null,y,n},
+    keywordstyle=\color{blue},
+    basicstyle=\ttfamily\small,
+    comment=[l]{\#},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{gray},
+    stringstyle=\color{orange},
+    moredelim=[l][\color{green}]{---},
+    moredelim=[l][\color{green}]{...},
+    morestring=[b]',
+    morestring=[b]"
+}
+
+\lstset{
+    basicstyle=\ttfamily,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{orange},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+}
+
+\begin{document}
+
+\title{Kubernetes Deployment Setup for \texttt{ic-webapp}}
+\author{}
+\date{}
+\maketitle
+
+\section*{Introduction}
+This document outlines the steps to set up and deploy the \texttt{ic-webapp} application on a Kubernetes cluster using Minikube with Docker as the driver.
+
+\section*{Prerequisites}
+\begin{itemize}
+    \item \textbf{Docker}: Ensure Docker is installed and running.
+    \item \textbf{Minikube}: Installed and configured to use Docker driver.
+    \item \textbf{kubectl}: Command-line tool for interacting with the Kubernetes cluster.
+\end{itemize}
+
+\section*{Installation Steps}
+
+\subsection*{Installing Docker}
+1. Download Docker Desktop from the \href{https://www.docker.com/products/docker-desktop}{Docker website}.
+2. Follow the installation instructions on the website.
+3. After installation, ensure Docker is running.
+
+\subsection*{Installing Minikube}
+1. Download the Minikube installer for Windows from the \href{https://minikube.sigs.k8s.io/docs/start/}{Minikube website}.
+2. Install Minikube by running the installer.
+3. Ensure Minikube uses Docker as the driver:
+   \begin{lstlisting}[language=bash]
+   minikube config set driver docker
+   \end{lstlisting}
+
+\subsection*{Installing kubectl}
+1. Download the kubectl binary for Windows from the \href{https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/}{Kubernetes website}.
+2. Add the binary to your system's PATH by following the installation instructions on the website.
+3. Verify the installation:
+   \begin{lstlisting}[language=bash]
+   kubectl version --client
+   \end{lstlisting}
+
+\section*{Setup Steps}
+
+\subsection*{1. Start Minikube}
+\begin{lstlisting}[language=bash]
+minikube start --driver=docker --kubernetes-version=v1.20.0
+\end{lstlisting}
+
+\subsection*{2. Create Namespace}
+Create a namespace for organizing resources.
+\begin{lstlisting}[language=yaml]
+# namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: icgroup
+\end{lstlisting}
+
+Apply the namespace:
+\begin{lstlisting}[language=bash]
+kubectl apply -f namespace.yaml
+\end{lstlisting}
+
+\subsection*{3. Create Deployment}
+Define the deployment for \texttt{ic-webapp}.
+\begin{lstlisting}[language=yaml]
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ic-webapp
+  namespace: icgroup
+  labels:
+    env: prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ic-webapp
+  template:
+    metadata:
+      labels:
+        app: ic-webapp
+    spec:
+      containers:
+        - name: ic-webapp
+          image: imane123456788/file_rouge:v1
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+\end{lstlisting}
+
+Apply the deployment:
+\begin{lstlisting}[language=bash]
+kubectl apply -f deployment.yaml
+\end{lstlisting}
+
+\subsection*{4. Create Services}
+
+\subsubsection*{NodePort Service}
+Expose the deployment using NodePort.
+\begin{lstlisting}[language=yaml]
+# nodeport-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ic-webapp-nodeport
+  namespace: icgroup
+spec:
+  selector:
+    app: ic-webapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30007
+  type: NodePort
+\end{lstlisting}
+
+Apply the service:
+\begin{lstlisting}[language=bash]
+kubectl apply -f nodeport-service.yaml
+\end{lstlisting}
+
+\subsubsection*{LoadBalancer Service}
+Optionally, expose the deployment using LoadBalancer.
+\begin{lstlisting}[language=yaml]
+# loadbalancer-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ic-webapp-loadbalancer
+  namespace: icgroup
+spec:
+  selector:
+    app: ic-webapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+\end{lstlisting}
+
+Apply the service:
+\begin{lstlisting}[language=bash]
+kubectl apply -f loadbalancer-service.yaml
+\end{lstlisting}
+
+\subsection*{5. Verify Services}
+Check the status of the services:
+\begin{lstlisting}[language=bash]
+kubectl get services -n icgroup
+\end{lstlisting}
+
+\subsection*{6. Access the Application}
+
+\subsubsection*{Using NodePort}
+Find the Minikube IP:
+\begin{lstlisting}[language=bash]
+minikube ip
+\end{lstlisting}
+
+Access the application at \texttt{http://<minikube-ip>:30007}.
+
+\subsubsection*{Using Minikube Service Command}
+\begin{lstlisting}[language=bash]
+minikube service ic-webapp-nodeport -n icgroup --url
+\end{lstlisting}
+
+\subsubsection*{Using Port Forwarding}
+\begin{lstlisting}[language=bash]
+kubectl port-forward svc/ic-webapp-nodeport 8080:80 -n icgroup
+\end{lstlisting}
+
+Access the application at \texttt{http://localhost:8080}.
+
+\section*{Troubleshooting}
+
+\subsection*{External IP Pending}
+If the external IP for LoadBalancer is pending, use NodePort or \texttt{minikube service} command.
+
+\subsection*{Cannot Access NodePort}
+Ensure Docker for Windows networking is configured correctly. Use port forwarding as an alternative.
+
+\section*{References}
+\begin{itemize}
+    \item \href{https://minikube.sigs.k8s.io/docs/}{Minikube Documentation}
+    \item \href{https://kubernetes.io/docs/}{Kubernetes Documentation}
+    \item \href{https://docs.docker.com/}{Docker Documentation}
+\end{itemize}
+
+\end{document}
