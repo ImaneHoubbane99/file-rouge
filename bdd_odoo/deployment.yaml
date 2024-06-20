@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bdd-odoo-deployment
+  namespace: icgroup
+  labels:
+    app: bdd-odoo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bdd-odoo
+  template:
+    metadata:
+      labels:
+        app: bdd-odoo
+    spec:
+      containers:
+      - name: bdd-odoo
+        image: postgres:latest
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: odoo
+        - name: POSTGRES_USER
+          value: odoo
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: odoo-db-secret
+              key: password
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: bdd-odoo-storage
+        resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+      volumes:
+      - name: bdd-odoo-storage
+        persistentVolumeClaim:
+          claimName: bdd-odoo-pvc
