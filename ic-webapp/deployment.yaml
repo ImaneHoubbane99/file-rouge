@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ic-webapp-deployment
+  namespace: icgroup
+  labels:
+    env: prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ic-webapp
+  template:
+    metadata:
+      labels:
+        app: ic-webapp
+    spec:
+      containers:
+        - name: ic-webapp
+          image: imane123456788/file_rouge:v1
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
