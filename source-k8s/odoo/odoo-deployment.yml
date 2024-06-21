@@ -17,8 +17,11 @@ spec:
         app: odoo
     spec:
       containers:
-      - image: odoo
-        name: odoo
+      - name: odoo
+        image: odoo
+        ports:
+        - name: odoo
+          containerPort: 8069
         env:
         - name: USER
           value: m2iformation
@@ -29,23 +32,20 @@ spec:
             secretKeyRef:
               name: odoo
               key: PASSWORD 
-        ports:
-        - containerPort: 8069
-          name: odoo
         volumeMounts:
-        - name: odoo-persistent-storage
+        - name: odoo-config
           mountPath: /etc/odoo
-        - name: lib-odoo-persistent-storage
+        - name: odoo-data
           mountPath: /var/lib/odoo
-        - name: extra-addons-persistent-storage
+        - name: odoo-addons
           mountPath: /mnt/extra-addons
       volumes:
-      - name: odoo-persistent-storage
+      - name: odoo-config
         hostPath:
           path: /data_docker/config
-      - name: extra-addons-persistent-storage
+      - name: odoo-addons
         hostPath:
           path: /data_docker/addons
-      - name: lib-odoo-persistent-storage
+      - name: odoo-data
         persistentVolumeClaim:
           claimName: odoo-pvc
