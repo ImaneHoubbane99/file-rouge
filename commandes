@@ -1,0 +1,9 @@
+
+
+1- Docker build -f ./Dockerfile -t cdobe01/ic-webapp:v1.0 .
+
+2- docker run -d --name ic-webapp-test -p 8000:8080 cdobe01/ic-webapp:v1.0
+
+3- docker login
+
+5- docker push cdobe01/ic-webapp:v1.0
