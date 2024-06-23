@@ -8,9 +8,7 @@
 
 5- docker push cdobe01/ic-webapp:v1.0
 
-
--- Executer ces commandes :
-
+------------------------------------------
 
 kubectl apply -f ./ic-webapp
 kubectl apply -f ./postgres
