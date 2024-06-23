@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: odoo
-  namespace: ic-webapp
+  namespace: icgroup
   labels:
     app: odoo
     env: prod
