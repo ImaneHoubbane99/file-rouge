@@ -2,14 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pg-admin
+  namespace: icgroup
   labels:
     app: pg-admin
     env: prod
-  namespace: icgroup
 spec:
   replicas: 1
   selector:
-    matchLabels: 
+    matchLabels:
       app: pg-admin
   template:
     metadata:
@@ -17,8 +17,8 @@ spec:
         app: pg-admin
     spec:
       containers:
-      - image: dpage/pgadmin4
-        name: pg-admin
+      - name: pg-admin
+        image: dpage/pgadmin4
         env:
         - name: PGADMIN_DEFAULT_EMAIL
           value: pgadmin@pgadmin.com
@@ -28,14 +28,21 @@ spec:
               name: pg-admin
               key: PGADMIN_DEFAULT_PASSWORD
         ports:
-        - containerPort: 5050
-          name: postgres
+        - name: postgres
+          containerPort: 5050
         volumeMounts:
         - name: pg-admin-server
           mountPath: /pgadmin4/servers.json
           subPath: servers.json
         - name: pg-admin-data
           mountPath: /var/lib/pgadmin
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
       volumes:
       - name: pg-admin-server
         configMap:

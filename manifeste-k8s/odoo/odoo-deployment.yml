@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: odoo
+  namespace: icgroup
   labels:
     app: odoo
     env: prod
-  namespace: icgroup
 spec:
   replicas: 1
   selector:
@@ -31,7 +31,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: odoo
-              key: PASSWORD 
+              key: PASSWORD
         volumeMounts:
         - name: odoo-config
           mountPath: /etc/odoo
@@ -39,6 +39,13 @@ spec:
           mountPath: /var/lib/odoo
         - name: odoo-addons
           mountPath: /mnt/extra-addons
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
       volumes:
       - name: odoo-config
         hostPath:
