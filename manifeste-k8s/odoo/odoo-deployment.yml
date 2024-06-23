@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: odoo
-  namespace: icgroup
+  namespace: ic-webapp
   labels:
     app: odoo
     env: prod
@@ -18,13 +18,13 @@ spec:
     spec:
       containers:
       - name: odoo
-        image: odoo
+        image: odoo:14.0  
         ports:
         - name: odoo
           containerPort: 8069
         env:
         - name: USER
-          value: m2iformation
+          value: toto
         - name: HOST
           value: postgres
         - name: PASSWORD
@@ -32,12 +32,14 @@ spec:
             secretKeyRef:
               name: odoo
               key: PASSWORD
+        - name: DATABASE
+          value: odoo  
         volumeMounts:
-        - name: odoo-config
+        - name: odoo-persistent-storage
           mountPath: /etc/odoo
-        - name: odoo-data
+        - name: lib-odoo-persistent-storage
           mountPath: /var/lib/odoo
-        - name: odoo-addons
+        - name: extra-addons-persistent-storage
           mountPath: /mnt/extra-addons
         resources:
           requests:
@@ -47,12 +49,14 @@ spec:
             memory: "512Mi"
             cpu: "1"
       volumes:
-      - name: odoo-config
+      - name: odoo-persistent-storage
         hostPath:
-          path: /data_docker/config
-      - name: odoo-addons
+          path: /data_k8s/config 
+          type: Directory
+      - name: extra-addons-persistent-storage
         hostPath:
-          path: /data_docker/addons
-      - name: odoo-data
+          path: /data_k8s/addons  
+          type: Directory
+      - name: lib-odoo-persistent-storage
         persistentVolumeClaim:
           claimName: odoo-pvc
