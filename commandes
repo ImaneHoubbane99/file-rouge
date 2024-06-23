@@ -8,12 +8,14 @@
 
 5- docker push cdobe01/ic-webapp:v1.0
 
+------------------------------------------
 
 kubectl apply -f ./ic-webapp
 kubectl apply -f ./postgres
 kubectl apply -f ./odoo
 kubectl apply -f ./pgadmin
 
+Dossier à creer dans le repertoire de travail 
 
 sudo mkdir -p /data_k8s/lib-odoo /data_k8s/pgadmin4 /data_k8s/postgres /data_k8s/addons /data_k8s/config
 
