@@ -2,23 +2,37 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pg-admin
-  namespace: icgroup
   labels:
     app: pg-admin
     env: prod
+  namespace: icgroup
 spec:
   replicas: 1
   selector:
-    matchLabels:
+    matchLabels: 
       app: pg-admin
   template:
     metadata:
       labels:
         app: pg-admin
     spec:
+      initContainers:
+      - name: init-pgadmin
+        image: busybox
+        command: ['sh', '-c', 'mkdir -p /var/lib/pgadmin/sessions && chmod -R 777 /var/lib/pgadmin']
+        volumeMounts:
+        - name: pg-admin-data
+          mountPath: /var/lib/pgadmin
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "64Mi"
+          requests:
+            cpu: "50m"
+            memory: "32Mi"
       containers:
-      - name: pg-admin
-        image: dpage/pgadmin4
+      - image: dpage/pgadmin4
+        name: pg-admin
         env:
         - name: PGADMIN_DEFAULT_EMAIL
           value: pgadmin@pgadmin.com
@@ -28,8 +42,8 @@ spec:
               name: pg-admin
               key: PGADMIN_DEFAULT_PASSWORD
         ports:
-        - name: postgres
-          containerPort: 5050
+        - containerPort: 5050
+          name: postgres
         volumeMounts:
         - name: pg-admin-server
           mountPath: /pgadmin4/servers.json
@@ -37,12 +51,12 @@ spec:
         - name: pg-admin-data
           mountPath: /var/lib/pgadmin
         resources:
-          requests:
-            memory: "256Mi"
-            cpu: "500m"
           limits:
+            cpu: "500m"
             memory: "512Mi"
-            cpu: "1"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
       volumes:
       - name: pg-admin-server
         configMap:
@@ -52,4 +66,4 @@ spec:
             path: servers.json    
       - name: pg-admin-data
         persistentVolumeClaim:
-          claimName: pgadmin-pvc
+          cl
