@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  {{ service_name }}:
+    container_name: {{ container_name }}
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    volumes:
+      - {{ pgadmin_volume_name }}:{{ pgadmin_data_dir }}
+    networks:
+      - {{ network_name }}
+
+networks:
+  {{ network_name }}:
+    driver: bridge
+
+volumes:
+  {{ pgadmin_volume_name }}:
