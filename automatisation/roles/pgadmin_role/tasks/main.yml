@@ -1,0 +1,6 @@
+- name: Deploy pgAdmin using Docker Compose
+  community.general.docker_compose:
+    project_src: "{{ playbook_dir }}/templates"
+    project_name: "{{ service_name }}"
+    definition: "{{ lookup('template', 'docker-compose.yml.j2') }}"
+    state: present

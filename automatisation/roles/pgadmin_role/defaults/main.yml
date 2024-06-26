@@ -1,0 +1,5 @@
+network_name: pgadmin_network
+pgadmin_volume_name: pgadmin_data
+pgadmin_data_dir: /var/lib/pgadmin
+service_name: pgadmin
+container_name: pgadmin_container

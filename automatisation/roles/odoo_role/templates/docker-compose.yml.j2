@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  {{ service_name }}:
+    container_name: {{ container_name }}
+    image: odoo:13
+    depends_on:
+      - db
+    ports:
+      - "8069:30069"
+    volumes:
+      - {{ odoo_volume_name }}:{{ odoo_data_dir }}
+    networks:
+      - {{ network_name }}
+
+  db:
+    image: postgres:10
+    volumes:
+      - {{ postgres_volume_name }}:{{ postgres_data_dir }}
+    environment:
+      POSTGRES_DB: odoo
+      POSTGRES_USER: toto
+      POSTGRES_PASSWORD: dG90bw==
+    networks:
+      - {{ network_name }}
+
+networks:
+  {{ network_name }}:
+    driver: bridge
+
+volumes:
+  {{ postgres_volume_name }}:
+  {{ odoo_volume_name }}:
