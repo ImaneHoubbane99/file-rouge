@@ -1,0 +1,9 @@
+1 - Deploiement et installation docker :
+
+- ansible-playbook playbooks/install-docker.yml -l prod
+
+2 -Deploiement des serveurs
+
+- ansible-playbook playbooks/deploy-odoo.yml -l odoo_server
+- ansible-playbook playbooks/deploy-pgadmin.yml -l pg_admin_server
+- ansible-playbook playbooks/deploy-ic-webapp.yml -l ic_webapp_server
