@@ -18,8 +18,8 @@ services:
       - {{ postgres_volume_name }}:{{ postgres_data_dir }}
     environment:
       POSTGRES_DB: odoo
-      POSTGRES_USER: odoo
-      POSTGRES_PASSWORD: odoo
+      POSTGRES_USER: toto
+      POSTGRES_PASSWORD: dG90bw==
     networks:
       - {{ network_name }}
 
