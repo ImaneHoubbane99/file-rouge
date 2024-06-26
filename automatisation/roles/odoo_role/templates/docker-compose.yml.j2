@@ -6,7 +6,7 @@ services:
     depends_on:
       - db
     ports:
-      - "8069:8069"
+      - "8069:30069"
     volumes:
       - {{ odoo_volume_name }}:{{ odoo_data_dir }}
     networks:
