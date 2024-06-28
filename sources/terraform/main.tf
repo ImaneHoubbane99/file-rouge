@@ -168,7 +168,7 @@ resource "null_resource" "vm_provisioner" {
     connection {
       type     = "ssh"
       user     = "azureuser"
-      password = "COME*dobe*04081987"
+      password = "votre mot de passe ici"
       host     = data.azurerm_public_ip.vm_public_ip.ip_address
       timeout  = "5m"
     }
