@@ -13,7 +13,7 @@ spec:
       app: ic-webapp
   template:
     metadata:
-      labels:
+      labels: 
         app: ic-webapp
     spec:
       containers:
